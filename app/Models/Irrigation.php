@@ -5,25 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Sensor extends Model
+class Irrigation extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'id_device',
-        'id_plant',
-        'suhu',
-        'kelembapan_udara',
-        'kelembapan_tanah',
-        'ph_tanah',
-        'nitrogen',
-        'fosfor',
-        'kalium',
-        'timestamp_pengukuran',
+        'id',
+        'rekomendasi_volume',
+        'kondisi',
+        'saran',
+        'created_at',
         'updated_at'
     ];
 
     // $guarded bisa digunakan sebagai alternatif untuk melindungi field tertentu
     // protected $guarded = [];
-    protected $table = 'data_sensor';
+    protected $table = 'irrigation';
 }

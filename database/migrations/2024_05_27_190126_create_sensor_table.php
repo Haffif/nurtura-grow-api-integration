@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('data_sensor', function (Blueprint $table) {
             $table->id('id');
-            $table->string('id_device');
-            $table->float('suhu');
-            $table->float('kelembapan_udara');
-            $table->float('kelembapan_tanah');
-            $table->float('ph_tanah');
-            $table->float('npk');
+            $table->string('id_device')->nullable();
+            $table->string('id_plant')->nullable();
+            $table->float('suhu')->nullable();
+            $table->float('kelembapan_udara')->nullable();
+            $table->float('kelembapan_tanah')->nullable();
+            $table->float('ph_tanah')->nullable();
+            $table->float('nitrogen')->nullable();
+            $table->float('fosfor')->nullable();
+            $table->float('kalium')->nullable();
             $table->timestamp('timestamp_pengukuran')->useCurrent();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
-
         });
     }
 

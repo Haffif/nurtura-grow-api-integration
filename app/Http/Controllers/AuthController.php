@@ -77,7 +77,7 @@ class AuthController extends Controller
                 'nama' => $data['nama'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'id_device' => 'cnt-gYAVQBiC7YciWplO'
+                'id_device' => 'CAEP0v54HFOtV1FsuyB'
             ]);
 
             return response()->json(['message' => 'Registration successful.'], 201);

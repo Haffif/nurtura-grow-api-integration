@@ -3,13 +3,14 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AntaresController;
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LahanController;
 use App\Http\Controllers\PenanamanController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\TanamanController;
 use App\Http\Controllers\SensorController;
+use App\Http\Controllers\MachineLearningController;
+use App\Http\Controllers\PengairanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,12 +27,27 @@ Route::get('/', function () {
     return response()->json(["message" => "hello world"]);
 });
 
-Route::get('/test', function () {
-    return response()->json(["message" => "testing"]);
+Route::group([
+    'prefix' => 'antares',
+    'as' => 'antares.'
+], function () {
+    Route::group([
+        'prefix' => 'webhook',
+        'as' => 'webhook.'
+    ], function () {
+        Route::post('camera', [AntaresController::class, 'handleAntaresCamera'])->name('camera');
+        Route::post('sensor', [AntaresController::class, 'handleAntaresSensor'])->name('sensor');
+    });
+    Route::post('downlink', [AntaresController::class, 'handleAntaresDownlink'])->name('downlink');
 });
 
-Route::post('/test', [TestController::class, 'handleTest'])->name('testController');
-Route::post('/antares/webhook', [AntaresController::class, 'handleAntaresWebhook'])->name('antaresWebhook');
+Route::group([
+    'prefix' => 'ml',
+    'as' => 'ml.'
+], function () {
+    Route::post('irrigation', [MachineLearningController::class, 'irrigation'])->name('irrigation');
+    Route::post('predict', [MachineLearningController::class, 'predict'])->name('predict');
+});
 
 Route::middleware('guest')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -39,6 +55,26 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('jwt.verify')->group(function () {
+    Route::group(['prefix' => 'fertilizer'], function () {
+        Route::get('data');
+        Route::post('input'); // input data air untuk melakukan penjadwalan siram air
+        Route::group([
+            'prefix' => 'sop',
+            'as' => 'sop.'
+        ], function () {
+            Route::post('input');
+        });
+    });
+    Route::group(['prefix' => 'irrigation'], function () {
+        Route::get('data');
+        Route::post('input'); 
+        Route::group([
+            'prefix' => 'sop',
+            'as' => 'sop.'
+        ], function () {
+            Route::post('input', [PengairanController::class, 'input_sop']);
+        });
+    });
     Route::group(['prefix' => 'sensor'], function () {
         Route::get('data', [SensorController::class, 'get_sensor']);
     });

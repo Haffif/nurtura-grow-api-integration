@@ -22,6 +22,9 @@ class VerifyCsrfToken extends Middleware
         '/lahan/*',
         '/penanaman/*',
         '/sensor/*',
+        '/ml/*',
+        '/irrigation/*',
+        '/fertilizer/*',
         '/plant/*'
     ];
 }

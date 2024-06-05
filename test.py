@@ -5,7 +5,7 @@ import json
 
 def send_images_in_directory(directory_path):
     # URL Antares
-    antares_url = "https://platform.antares.id:8443/~/antares-cse/cnt-gYAVQBiC7YciWplO"
+    antares_url = "https://platform.antares.id:8443/~/antares-cse/cnt-Aci6tYjCsroaXZJt"
     
     # Header
     headers = {

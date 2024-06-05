@@ -18,9 +18,9 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->decimal('latitude', 9, 6);
             $table->decimal('longitude', 9, 6);
-            $table->string('kecamatan', 100);
-            $table->string('kota', 100);
-            $table->text('alamat');
+            $table->string('kecamatan', 100)->nullable();
+            $table->string('kota', 100)->nullable();
+            $table->text('alamat')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
         });
