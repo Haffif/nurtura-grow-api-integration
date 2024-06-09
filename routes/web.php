@@ -11,6 +11,7 @@ use App\Http\Controllers\TanamanController;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\MachineLearningController;
 use App\Http\Controllers\PengairanController;
+use App\Http\Controllers\PemupukanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,7 @@ Route::group([
         'prefix' => 'webhook',
         'as' => 'webhook.'
     ], function () {
-        Route::post('camera', [AntaresController::class, 'handleAntaresCamera'])->name('camera');
+        Route::post('cameras', [AntaresController::class, 'handleAntaresCamera'])->name('camera');
         Route::post('sensor', [AntaresController::class, 'handleAntaresSensor'])->name('sensor');
     });
     Route::post('downlink', [AntaresController::class, 'handleAntaresDownlink'])->name('downlink');
@@ -45,6 +46,7 @@ Route::group([
     'prefix' => 'ml',
     'as' => 'ml.'
 ], function () {
+    Route::post('fertilizer', [MachineLearningController::class, 'fertilizer'])->name('fertilizer');
     Route::post('irrigation', [MachineLearningController::class, 'irrigation'])->name('irrigation');
     Route::post('predict', [MachineLearningController::class, 'predict'])->name('predict');
 });
@@ -56,17 +58,17 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('jwt.verify')->group(function () {
     Route::group(['prefix' => 'fertilizer'], function () {
-        Route::get('data');
-        Route::post('input'); // input data air untuk melakukan penjadwalan siram air
+        Route::get('data', [PemupukanController::class, 'get_data']);
+        Route::post('input'); 
         Route::group([
             'prefix' => 'sop',
             'as' => 'sop.'
         ], function () {
-            Route::post('input');
+            Route::post('input', [PemupukanController::class, 'input_sop']);
         });
     });
     Route::group(['prefix' => 'irrigation'], function () {
-        Route::get('data');
+        Route::get('data', [PengairanController::class, 'get_data']);
         Route::post('input'); 
         Route::group([
             'prefix' => 'sop',

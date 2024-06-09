@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('irrigation', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_device');
             $table->float('rekomendasi_volume')->nullable();
-            $table->foreignId('kondisi')->nullable();
-            $table->foreignId('saran')->nullable();
+            $table->text('kondisi')->nullable();
+            $table->text('saran')->nullable();
             $table->timestamps();
 
         });

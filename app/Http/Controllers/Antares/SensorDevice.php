@@ -44,10 +44,10 @@ class SensorDevice
         $isComplete = false;
 
         if ($con_data['id_device'] != 'master') {
-            $sensor = Sensor::where('timestamp_pengukuran', $currentTimestamp)->where('id_plant', $con_data['id_device']);
+            $sensor = Sensor::where('timestamp_pengukuran', $currentTimestamp)->where('id_plant', 'CAEP0v54HFOtV1FsuyB');
 
             if ($sensor->exists()) {
-                // Log::info("Slave update");
+                Log::info("Slave update");
                 $isComplete = true;
 
                 $sensor->update([
@@ -70,9 +70,9 @@ class SensorDevice
                     ]);
                 if ($affectedRows > 0) {
                     $isComplete = true;
-                    // Log::info("Slave Updated {$affectedRows} sensors.");
+                    Log::info("Slave Updated {$affectedRows} sensors.");
                 } else {
-                    // Log::info("Slave create");
+                    Log::info("Slave create");
                     Sensor::create([
                         'id_device' => 'CAEP0v54HFOtV1FsuyB',
                         'id_plant' => $con_data['id_device'] == '-' ? 0 : $con_data['id_device'],
@@ -84,9 +84,8 @@ class SensorDevice
                         'fosfor' => $con_data['fosfor'] == '-' ? 0 : $con_data['fosfor'],
                         'kalium' => $con_data['pottasium'] == '-' ? 0 : $con_data['pottasium'],
                         'timestamp_pengukuran' => $currentTimestamp,
-                    ]);  
+                    ]);
                 }
-             
             }
         }
 
@@ -99,9 +98,9 @@ class SensorDevice
 
             if ($affectedRows > 0) {
                 $isComplete = true;
-                // Log::info("Master Updated {$affectedRows} sensors.");
+                Log::info("Master Updated {$affectedRows} sensors.");
             } else {
-                // Log::info("Master create");
+                Log::info("Master create");
 
                 Sensor::create([
                     'id_device' => 'CAEP0v54HFOtV1FsuyB',
@@ -113,23 +112,24 @@ class SensorDevice
                     'fosfor' => $con_data['fosfor'] == '-' ? 0 : $con_data['fosfor'],
                     'kalium' => $con_data['pottasium'] == '-' ? 0 : $con_data['pottasium'],
                     'timestamp_pengukuran' => $currentTimestamp,
-                ]);              }
+                ]);
+            }
         }
 
-        if($isComplete){
-            $datas = Sensor::where('timestamp_pengukuran', $currentTimestamp)->first();
+        if ($isComplete) {
+            $datas = Sensor::where('timestamp_pengukuran', $currentTimestamp)->where('id_device', 'CAEP0v54HFOtV1FsuyB')->first();
             $data = [
                 "SoilMoisture" => $datas->kelembapan_tanah,
                 "Humidity" => $datas->kelembapan_udara,
                 "temperature" => $datas->suhu
             ];
-            // Log::info($data);
+            
             // // Rekomendasi ML irigasi 
             $response = Http::post(route('ml.irrigation'), $data);
             $data_response = json_decode($response, true)['data'];
             // Log::info($data_response);
 
-            if($data_response['Informasi Kluster']['nyala']){
+            if ($data_response['Informasi Kluster']['nyala']) {
                 $type = 0;
                 $status = 'OPEN';
                 $durasi = $data_response['Informasi Kluster']['waktu'];
@@ -142,9 +142,11 @@ class SensorDevice
 
                 $responseDownlink = Http::post(route('antares.downlink'), $dataDownlink);
 
-                // Log::info($responseDownlink);
-                if($responseDownlink->status() == 200){
+                Log::info($responseDownlink);
+
+                if ($responseDownlink->status() == 200) {
                     $irrigation = Irrigation::create([
+                        'id_device' => 'CAEP0v54HFOtV1FsuyB',
                         'rekomendasi_volume' => $volume,
                         'kondisi' => $data_response['Kondisi'],
                         'saran' => $data_response['Saran'],
@@ -160,17 +162,15 @@ class SensorDevice
                         'durasi' => $durasi,
                         'volume' => $volume
                     ]);
-
                 }
             } else {
                 $irrigation = Irrigation::create([
+                    'id_device' => 'CAEP0v54HFOtV1FsuyB',
                     'rekomendasi_volume' => 0,
                     'kondisi' => $data_response['Kondisi'],
                     'saran' => $data_response['Saran'],
                 ]);
             }
-            
         }
-       
     }
 }

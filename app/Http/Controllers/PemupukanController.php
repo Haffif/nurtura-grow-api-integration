@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Irrigation;
-use App\Models\SopPengairan;
+use App\Models\Fertilizer;
+use App\Models\SopPemupukan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class PengairanController extends Controller
+class PemupukanController extends Controller
 {
-    public function get_data(Request $request){
-        $id_device = $request->query('id_device');
+    public function get_data(Request $request)
+    {
+        $id_user = $request->query('id_user');
         try {
-            if (!empty($id_device)) {
+            if (!empty($id_user)) {
                 // Mencari semua irrigation yang memiliki id_user yang sesuai
-                $irrigation = Irrigation::where('id_device', $id_device)->get();
+                $irrigation = Fertilizer::where('id_user', $id_user)->get();
 
                 // Memeriksa apakah hasilnya kosong
                 if ($irrigation->isEmpty()) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Tidak ada data yang ditemukan untuk id_device ini.'
+                        'message' => 'Tidak ada data yang ditemukan untuk id_user ini.'
                     ], 404);
                 }
 
@@ -31,7 +33,7 @@ class PengairanController extends Controller
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Parameter id_device diperlukan.'
+                    'message' => 'Parameter id_user diperlukan.'
                 ], 400);
             }
         } catch (\Exception $e) {
@@ -47,19 +49,24 @@ class PengairanController extends Controller
     {
         try {
             $data = $request->validate([
-                'nama' => 'required', // Assuming 'nama' is unique
+                'id_user' => 'required',
+                'hst' => 'required',
                 'min' => 'required',
                 'max' => 'required',
             ]);
-
-            $sop = SopPengairan::updateOrCreate(
-                ['nama' => $data['nama']], // Key to find
-                ['min' => $data['min'], 'max' => $data['max']] // Data to update or create
+            
+            $sop = SopPemupukan::updateOrCreate(
+                ['id_user' => $data['id_user']], // Key to find                
+                [
+                    'hari_setelah_tanam'=>$data['hst'], 
+                    'tinggi_tanaman_minimal_mm' => $data['min'],
+                    'tinggi_tanaman_maksimal_mm' => $data['max']
+                ] 
             );
-
+            
             return response()->json([
                 'success' => true,
-                'message' => $sop->wasRecentlyCreated ? 'Data sop pengairan berhasil ditambahkan!' : 'Data sop pengairan berhasil diperbarui!',
+                'message' => $sop->wasRecentlyCreated ? 'Data sop pemupukan berhasil ditambahkan!' : 'Data sop pemupukan berhasil diperbarui!',
             ], 200);
         } catch (ValidationException $e) {
             return response()->json(['error' => 'Validation failed', 'messages' => $e->errors()], 422);
