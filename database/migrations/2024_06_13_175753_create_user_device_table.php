@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('irrigation', function (Blueprint $table) {
-            $table->id('id');
+        Schema::create('user_device', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_user');
             $table->string('id_device');
-            $table->float('rekomendasi_volume')->nullable();
-            $table->text('kondisi')->nullable();
-            $table->text('saran')->nullable();
+            $table->boolean('isAssigned')->default(false);
             $table->timestamps();
-
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('irrigation');
+        Schema::dropIfExists('user_device');
     }
 };

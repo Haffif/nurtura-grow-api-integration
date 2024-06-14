@@ -12,12 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('device', function (Blueprint $table) {
-            $table->string('id');
-            $table->foreignId('tipe_intruksi')->nullable();
-            $table->foreignId('fertilization_controller')->nullable();
-            $table->foreignId('irrigation_controller')->nullable();
-            $table->float('durasi')->nullable();
-            $table->boolean('isActive')->nullable();
+            $table->id('id');
+            $table->string('id_device');
+            $table->foreignId('tipe_intruksi')->default(null);
+            $table->float('volume')->default(0);
+            $table->float('durasi')->default(0);
+            $table->boolean('isActive')->default(false);
+            $table->boolean('isPending')->default(false);
+            $table->string('mode');
+            $table->timestamp('start');
+            $table->timestamp('end');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

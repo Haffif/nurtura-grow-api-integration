@@ -41,7 +41,6 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'username' => $user->username,
                 'nama' => $user->nama,
-                'created_at' => $user->created_at->toDateTimeString(),
             ];
 
             return response()->json([
@@ -64,20 +63,17 @@ class AuthController extends Controller
     {
         try {
             $data = $request->validate([
-                'id' => 'required|max:255',
                 'nama' => 'required|max:255',
                 'username' => 'required|max:255',
                 'email' => 'required|email|unique:users',
-                'password' => 'required|min:8|confirmed',
+                'password' => 'required|min:8',
             ]);
 
             $user = User::create([
-                'id' => $data['id'],
                 'username' => $data['username'],
                 'nama' => $data['nama'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'id_device' => 'CAEP0v54HFOtV1FsuyB'
             ]);
 
             return response()->json(['message' => 'Registration successful.'], 201);

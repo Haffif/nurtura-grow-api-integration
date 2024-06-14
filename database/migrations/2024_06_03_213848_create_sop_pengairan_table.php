@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sop_pengairan', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_penanaman');
             $table->string('nama');
             $table->string('min');
             $table->string('max');

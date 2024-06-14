@@ -101,7 +101,6 @@ class SensorDevice
                 Log::info("Master Updated {$affectedRows} sensors.");
             } else {
                 Log::info("Master create");
-
                 Sensor::create([
                     'id_device' => 'CAEP0v54HFOtV1FsuyB',
                     'suhu' => $con_data['suhu'] == '-' ? 0 : $con_data['suhu'],
@@ -117,17 +116,32 @@ class SensorDevice
         }
 
         if ($isComplete) {
-            $datas = Sensor::where('timestamp_pengukuran', $currentTimestamp)->where('id_device', 'CAEP0v54HFOtV1FsuyB')->first();
-            $data = [
-                "SoilMoisture" => $datas->kelembapan_tanah,
-                "Humidity" => $datas->kelembapan_udara,
-                "temperature" => $datas->suhu
-            ];
+            $currentTimestamp = Carbon::now()->format('Y:m:d H:i');
+            $datas = Sensor::where('id_device', 'CAEP0v54HFOtV1FsuyB')->where('timestamp_pengukuran', $currentTimestamp)->get();
             
+            $total_soil = 0;
+            $total_hum = 0;
+            $total_temp = 0;
+            $size = count($datas);
+
+            foreach ($datas as $data) {
+                $total_soil += $data->kelembapan_tanah;
+                $total_hum += $data->kelembapan_udara;
+                $total_temp += $data->suhu;
+            }
+
+            $avgData = [
+                "SoilMoisture" => $total_soil / $size,
+                "Humidity" => $total_hum / $size,
+                "temperature" => $total_temp / $size
+            ];
+
             // // Rekomendasi ML irigasi 
-            $response = Http::post(route('ml.irrigation'), $data);
+            $response = Http::post(route('ml.irrigation'), $avgData);
+            Log::info($response);
+            Log::info($avgData);
+
             $data_response = json_decode($response, true)['data'];
-            // Log::info($data_response);
 
             if ($data_response['Informasi Kluster']['nyala']) {
                 $type = 0;
@@ -143,25 +157,37 @@ class SensorDevice
                 $responseDownlink = Http::post(route('antares.downlink'), $dataDownlink);
 
                 Log::info($responseDownlink);
+                Log::info($responseDownlink->status());
 
                 if ($responseDownlink->status() == 200) {
-                    $irrigation = Irrigation::create([
-                        'id_device' => 'CAEP0v54HFOtV1FsuyB',
-                        'rekomendasi_volume' => $volume,
-                        'kondisi' => $data_response['Kondisi'],
-                        'saran' => $data_response['Saran'],
-                    ]);
+                    try {
+                        $irrigation = Irrigation::create([
+                                'id_device' => 'CAEP0v54HFOtV1FsuyB',
+                                'rekomendasi_volume' => $volume,
+                                'kondisi' => $data_response['Kondisi'],
+                                'saran' => $data_response['Saran'],
+                            ]);
+                            
+                        $start = Carbon::now();
+                        $end = $start->copy()->addSeconds($durasi);
 
-                    // Access the ID of the newly created record
-                    $irrigationId = $irrigation->id;
+                        $addDevice = Device::create([
+                            'id_device' => 'CAEP0v54HFOtV1FsuyB',
+                            'tipe_intruksi' => $type,
+                            'durasi' => $durasi,
+                            'start' => $start,
+                            'isActive' => true,
+                            'end' => $end,
+                            'volume' => $volume,
+                            'mode' => 'auto'
+                        ]);
+                    } catch (\Exception $e) {
+                        // Log the error
+                        Log::error('Error creating irrigation record: ' . $e->getMessage());
+                        // You might also want to handle the error in a way that is appropriate for your application
+                    }
 
-                    Device::create([
-                        'id' => 'CAEP0v54HFOtV1FsuyB',
-                        'irrigation' => $irrigationId,
-                        'tipe_intruksi' => $type,
-                        'durasi' => $durasi,
-                        'volume' => $volume
-                    ]);
+                 
                 }
             } else {
                 $irrigation = Irrigation::create([

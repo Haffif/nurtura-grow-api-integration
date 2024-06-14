@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Penanaman;
 
 class PenanamanController extends Controller
 {
     public function get_penanaman(Request $request){
-        $id_user = $request->query('id_user');
-
         try {
+            $data = $request->validate([
+                'id_user' => 'required',
+            ]);
+
+            $id_user = $data['id_user'];
             if (!empty($id_user)) {
                 $penanaman = Penanaman::where('id_user', $id_user)->get();
                 if ($penanaman->isEmpty()) {
@@ -33,9 +37,8 @@ class PenanamanController extends Controller
                     'message' => 'Parameter id_user diperlukan.'
                 ], 400);
             }
-
-        } catch (\Throwable $th) {
-            //throw $th;
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server error', 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -44,14 +47,16 @@ class PenanamanController extends Controller
             $data = $request->validate([
                 'id_user' => 'required',
                 'id_lahan' => 'required',
+                'id_device' => 'required',
                 'nama_penanaman' => 'required',   
                 'jenis_tanaman' => 'required',             
                 'tanggal_tanam' => 'required',
             ]);
-
+            
             Penanaman::create([
                 'id_user' => $data['id_user'],
                 'id_lahan' => $data['id_lahan'],
+                'id_device' => $data['id_device'],
                 'nama_penanaman' => $data['nama_penanaman'],
                 'jenis_tanaman' => $data['jenis_tanaman'],
                 'tanggal_tanam' => $data['tanggal_tanam'],
@@ -71,12 +76,12 @@ class PenanamanController extends Controller
     {
         try {
             $data = $request->validate([
-                'id' => 'required',
+                'id_penanaman' => 'required',
                 'tanggal_pencatatan' => 'required',
                 'tinggi_tanaman' => 'required', // based in cm
             ]);
 
-            $penanaman = Penanaman::find($data['id']);
+            $penanaman = Penanaman::find($data['id_penanaman']);
 
             if ($penanaman) {
                 // Record exists, update the record
@@ -97,4 +102,66 @@ class PenanamanController extends Controller
             return response()->json(['error' => 'Server error', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function delete_penanaman(Request $request)
+    {
+        $id_penanaman = $request->query('id_penanaman');
+        
+        try {
+            if (!empty($id_penanaman)) {
+                $penanaman = Penanaman::where('id', $id_penanaman)->delete();
+                if($penanaman !=0 ){
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'Data penanaman berhasil dihapus'
+                    ], 200);
+                }
+                return response()->json([
+                    'success' => false,
+                    'data' => 'Data penanaman tidak ditemukan'
+                ], 400);
+            }
+        } catch (ValidationException $e) {
+            return response()->json(['error' => 'Validation failed', 'messages' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server error', 'message' => $e->getMessage()], 500);
+        }
+    }
+    public function update_penanaman(Request $request)
+    {
+        try {
+            // Validasi input, hanya field yang disertakan yang divalidasi
+            $data = $request->validate([
+                'id_penanaman' => 'required', // Pastikan ID penanaman disertakan untuk mencari data yang spesifik
+                'id_user' => 'sometimes|required',
+                'id_lahan' => 'sometimes|required',
+                'id_device' => 'sometimes|required',
+                'nama_penanaman' => 'sometimes|required',
+                'jenis_tanaman' => 'sometimes|required',
+                'tanggal_tanam' => 'sometimes|required',
+            ]);
+
+            $penanaman = Penanaman::find($data['id_penanaman']);
+
+            if (!$penanaman) {
+                return response()->json(['success' => false, 'message' => 'Data penanaman tidak ditemukan'], 404);
+            }
+
+            // Menghapus 'id_penanaman' dari array $data karena tidak perlu dalam proses update
+            unset($data['id_penanaman']);
+
+            // Perbarui hanya field yang disertakan dalam request
+            $penanaman->update($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data penanaman berhasil diperbarui',
+            ], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => 'Validation failed', 'messages' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
 }

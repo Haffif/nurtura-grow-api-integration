@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('fertilizer', function (Blueprint $table) {
             $table->id('id');
-            $table->float('tinggi_optimal');
+            $table->string('id_device');
+            $table->boolean('isOptimal');
             $table->text('message');
-            $table->integer('waktu');
+            $table->double('waktu');
             $table->timestamps();
         });
     }

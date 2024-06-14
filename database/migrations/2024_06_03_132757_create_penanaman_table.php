@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id('id');
             $table->foreignId('id_lahan');
             $table->foreignId('id_user');
+            $table->string('id_device');
             $table->string('nama_penanaman');
-            $table->string('tinggi_tanaman')->nullable();
+            $table->double('tinggi_tanaman')->default(0);
             $table->string('jenis_tanaman');
             $table->string('keterangan')->nullable();
             $table->date('tanggal_tanam');

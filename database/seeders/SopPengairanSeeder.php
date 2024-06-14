@@ -14,6 +14,7 @@ class SopPengairanSeeder extends Seeder
     {
         SopPengairan::insert([
             [
+                "id_penanaman" => 1,
                 'nama' => 'temperature',
                 'min' => '25',
                 'max' => '33',
@@ -21,6 +22,7 @@ class SopPengairanSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                "id_penanaman" => 1,
                 'nama' => 'humidity',
                 'min' => '60',
                 'max' => '69',
@@ -28,6 +30,7 @@ class SopPengairanSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                "id_penanaman" => 1,
                 'nama' => 'soil_moisture',
                 'min' => '50',
                 'max' => '69',

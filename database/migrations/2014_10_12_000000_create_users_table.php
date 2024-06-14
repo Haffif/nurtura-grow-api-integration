@@ -19,7 +19,8 @@ class CreateUsersTable extends Migration
             $table->string('username', 50)->unique();
             $table->string('email', 100)->unique();
             $table->string('password', 255);
-            $table->string('id_device')->nullable();
+            $table->string('otp_code', 4)->nullable();
+            $table->timestamp('otp_expiry')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

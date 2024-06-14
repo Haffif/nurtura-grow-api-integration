@@ -13,6 +13,7 @@ class Penanaman extends Model
         'id',
         'id_user',
         'id_lahan',
+        'id_device',
         'tinggi_tanaman',
         'jenis_tanaman',
         'tanggal_tanam',

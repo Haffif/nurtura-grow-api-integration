@@ -14,9 +14,8 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         '/upload-image',
         '/antares/*',
-        '/test',
-        '/login',
-        '/register',
+        '/auth/*',
+        '/user/*',
         '/logout',
         '/refresh-token',
         '/lahan/*',
@@ -25,6 +24,7 @@ class VerifyCsrfToken extends Middleware
         '/ml/*',
         '/irrigation/*',
         '/fertilizer/*',
-        '/plant/*'
+        '/plant/*',
+        '/device/*',
     ];
 }

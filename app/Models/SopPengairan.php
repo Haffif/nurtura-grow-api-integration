@@ -11,6 +11,7 @@ class SopPengairan extends Model
 
     protected $fillable = [
         'id',
+        'id_penanaman',
         'nama',
         'min',
         'max',

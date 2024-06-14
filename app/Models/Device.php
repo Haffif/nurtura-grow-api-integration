@@ -10,10 +10,16 @@ class Device extends Model
     use HasFactory;
     protected $fillable = [
         'id',
+        'id_device',
+        'id_user',
         'tipe_intruksi',
         'volume',
-        'irrigation',
         'durasi',
+        'start',
+        'end',
+        'isActive',
+        'isPending',
+        'mode',
         'created_at',
         'updated_at'
     ];
