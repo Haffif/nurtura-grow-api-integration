@@ -18,7 +18,7 @@ class CameraDevice
     {
         try {
             // Direktori untuk menyimpan file .txt
-            $txtDir = storage_path('base64');
+            $txtDir = storage_path('newBase64');
             if (!file_exists($txtDir)) {
                 mkdir($txtDir, 0777, true);
             }
@@ -43,6 +43,7 @@ class CameraDevice
                 $all_base64_images .= "data:image/jpeg;base64," . $con_data['image_data'];
 
                 if ($con_data['status'] === "end") {
+
                     Log::info($con_data['status']);
 
                     // Encode base64 menjadi gambar
@@ -85,10 +86,10 @@ class CameraDevice
                     // Setelah selesai mengirim gambar, hapus file .txt
                     unlink($txtFile);
 
-                    $plant = Plant::create(
-                        // ['id' => $con_data['id']],
+                    $plant = Plant::updateOrCreate(
+                        ['id' => $con_data['id']],
                         [
-                            'id' => $con_data['id'],
+                            // 'id' => $con_data['id'],
                             'id_device' => 'CAEP0v54HFOtV1FsuyB',
                             'url' => $imageUrl,
                             'posisi' => $con_data['posisi'],

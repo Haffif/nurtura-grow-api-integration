@@ -19,7 +19,7 @@ class DeviceController extends Controller
             ]);
 
             $id_user = $data['id_user'];
-            $user = User::where('id', $id_user)->first();
+            $user = UserDevice::where('id', $id_user)->first();
             $id_device = $user->id_device;
 
             $devices = Device::where('id_device', $id_device)->get();
@@ -45,8 +45,8 @@ class DeviceController extends Controller
                 'id_user' => 'required',
                 'id_device' => 'required',
             ]);
-            $device = UserDevice::where('id_device',$data['id_device'])->first();
-            if($device == null){
+            $device = UserDevice::where('id_device', $data['id_device'])->first();
+            if ($device == null) {
                 UserDevice::create([
                     'id_user' => $data['id_user'],
                     'id_device' => $data['id_device']

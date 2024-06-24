@@ -38,8 +38,8 @@ Route::group([
         'prefix' => 'webhook',
         'as' => 'webhook.'
     ], function () {
-        Route::post('cameras', [AntaresController::class, 'handleAntaresCamera'])->name('camera');
-        Route::post('sensor', [AntaresController::class, 'handleAntaresSensor'])->name('sensor');
+        Route::post('test_cameras', [AntaresController::class, 'handleAntaresCamera'])->name('camera');
+        Route::post('testing_sensors', [AntaresController::class, 'handleAntaresSensor'])->name('sensor');
     });
     Route::post('downlink', [AntaresController::class, 'handleAntaresDownlink'])->name('downlink');
 });
@@ -105,6 +105,7 @@ Route::middleware('jwt.verify')->group(function () {
     });
     Route::group(['prefix' => 'penanaman'], function () {
         Route::get('data', [PenanamanController::class, 'get_penanaman']); // get data penanaman by user id
+        Route::get('tinggi', [PenanamanController::class, 'get_tinggi']); // get data tinggi
         Route::post('input', [PenanamanController::class, 'input_penanaman']); // tambah data penanaman
         Route::put('tinggi', [PenanamanController::class, 'update_tinggi']); // input manual atau update data penanaman
         Route::put('update', [PenanamanController::class, 'update_penanaman']);

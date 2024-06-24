@@ -5,11 +5,11 @@ import json
 
 def send_images_in_directory(directory_path):
     # URL Antares
-    antares_url = "https://platform.antares.id:8443/~/antares-cse/cnt-Aci6tYjCsroaXZJt"
+    antares_url = "https://platform.antares.id:8443/~/antares-cse/cnt-nUYb2U2ePZi1te9x"
     
     # Header
     headers = {
-        "X-M2M-Origin": "702223ac71ba2b1e:5e5e1e498d1b0901",
+        "X-M2M-Origin": "52611abd7352ee93:5b27d91bb8c356e7",
         "Content-Type": "application/json;ty=4",
         "Accept": "application/json"
     }

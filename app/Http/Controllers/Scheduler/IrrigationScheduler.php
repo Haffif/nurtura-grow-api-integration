@@ -26,7 +26,7 @@ class IrrigationScheduler
                         $device->save();
 
                         $dataDownlink = ([
-                            'data' => 0 . 'CLOSE'
+                            'data' => 1 . 'CLOSE'
                         ]);
 
                        Http::post(route('antares.downlink'), $dataDownlink);
@@ -60,7 +60,7 @@ class IrrigationScheduler
                         $device->save();
 
                         $dataDownlink = ([
-                            'data' => 0 . 'OPEN' . $device->durasi
+                            'data' => 1 . 'OPEN' . $device->durasi
                         ]);
 
                        Http::post(route('antares.downlink'), $dataDownlink);

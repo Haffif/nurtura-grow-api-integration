@@ -9,16 +9,17 @@ use App\Models\Lahan;
 
 class LahanController extends Controller
 {
-    public function input_lahan(Request $request){
+    public function input_lahan(Request $request)
+    {
         try {
-            
+
             $data_lahan = $request->validate([
                 'id_user' => 'required',
                 'nama_lahan' => 'required',
                 'deskripsi' => 'required',
                 'longitude' => 'required',
                 'latitude' => 'required'
-            ]);
+            ]); 
 
             Lahan::create([
                 'id_user' => $data_lahan['id_user'],
@@ -44,27 +45,30 @@ class LahanController extends Controller
         // Mendapatkan id_user dari query string
         try {
             $data = $request->validate([
-                'id_user' => 'required',
+                'id_user' => 'required_without_all:id_lahan',
+                'id_lahan' => 'required_without_all:id_user'
             ]);
 
-            $id_user = $data['id_user'];
+            $id_user = $request->query('id_user');
+            $id_lahan = $request->query('id_lahan');
+
             if (!empty($id_user)) {
-                // Mencari semua lahan yang memiliki id_user yang sesuai
                 $lahan = Lahan::where('id_user', $id_user)->get();
-
-                // Memeriksa apakah hasilnya kosong
-                if ($lahan->isEmpty()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Tidak ada lahan yang ditemukan untuk id_user ini.'
-                    ], 404);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'data' => $lahan
-                ], 200);
+            } else {
+                $lahan = Lahan::where('id', $id_lahan)->get();
             }
+
+            if ($lahan->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada lahan yang ditemukan untuk id_user ini.'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $lahan
+            ], 200);
         } catch (ValidationException $e) {
             return response()->json(['error' => 'Validation failed', 'messages' => $e->errors()], 422);
         } catch (\Exception $e) {
@@ -109,7 +113,7 @@ class LahanController extends Controller
             return response()->json(['error' => 'Server error', 'message' => $e->getMessage()], 500);
         }
     }
-    
+
     public function delete_lahan(Request $request)
     {
         // Mendapatkan id_user dari query string

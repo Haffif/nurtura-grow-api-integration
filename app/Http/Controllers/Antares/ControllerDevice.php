@@ -58,13 +58,11 @@ class ControllerDevice
                     "message" => "Terjadi kesalahan: " . $response->body(),
                 ], $response->status());
             }
-
         } catch (\Exception $e) {
             return response()->json([
                 "status" => 500,
                 "message" => "Terjadi kesalahan: " . $e->getMessage(),
             ], 500);
         }
-
     }
 }

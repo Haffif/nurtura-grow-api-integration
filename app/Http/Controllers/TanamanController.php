@@ -15,7 +15,7 @@ class TanamanController extends Controller
         try {
             $data = $request->validate([
                 'id_penanaman' => 'required',
-            ]); 
+            ]);
 
             $id_penanaman = $data['id_penanaman'];
             $jenis_tanaman = $request->query('tanaman');
@@ -25,19 +25,21 @@ class TanamanController extends Controller
 
             if ($id_penanaman) {
                 $query->where('id', $id_penanaman);
+
             }
             if ($jenis_tanaman) {
                 if ($jenis_tanaman == 'bawang_merah') {
-                    $query->where('jenis_tanaman', 'bawang merah');
+                    $query->where('jenis_tanaman', 'bawang_merah');
                 }
             }
 
             $penanaman = $query->first();
+
             $id_device = $penanaman->id_device;
-            
+
             if (!empty($id_device)) {
                 $tanaman = Plant::where('id_device', $id_device)->get();
-              
+
                 if ($tanaman->isEmpty()) {
                     return response()->json([
                         'success' => false,

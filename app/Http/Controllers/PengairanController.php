@@ -26,11 +26,11 @@ class PengairanController extends Controller
 
             $id_user = $data['id_user'];
             $user = UserDevice::where('id_user', $id_user)->first();
-            if($user == null){
+            if ($user == null) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Tidak ditemukan device untuk user ini. Mohon daftarkan device dahulu !'
-                ], 404); 
+                ], 404);
             }
             $id_device = $user->id_device;
 
@@ -64,7 +64,7 @@ class PengairanController extends Controller
 
     public function get_sop(Request $request)
     {
-        
+
         try {
             $id_penanaman = $request->query('id_penanaman');
             if (!empty($id_penanaman)) {
@@ -123,9 +123,9 @@ class PengairanController extends Controller
                 }
 
                 $dataDownlink = ([
-                    'data' => 0 . 'CLOSE'
+                    'data' => 1 . 'CLOSE'
                 ]);
-
+                Log::info($dataDownlink);   
                 $responseDownlink = Http::post(route('antares.downlink'), $dataDownlink);
                 Log::info("irrigation manual : force stop device");
             } else {
@@ -152,7 +152,6 @@ class PengairanController extends Controller
                 'volume' => $data['volume'],
                 'mode' => 'manual'
             ]);
-            
         } catch (ValidationException $e) {
             return response()->json(['error' => 'Validation failed', 'messages' => $e->errors()], 422);
         } catch (\Exception $e) {
@@ -186,5 +185,4 @@ class PengairanController extends Controller
             return response()->json(['error' => 'Server error', 'message' => $e->getMessage()], 500);
         }
     }
-
 }

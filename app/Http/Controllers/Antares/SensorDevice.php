@@ -43,76 +43,39 @@ class SensorDevice
         $currentTimestamp = Carbon::now()->format('Y:m:d H:i');
         $isComplete = false;
 
-        if ($con_data['id_device'] != 'master') {
-            $sensor = Sensor::where('timestamp_pengukuran', $currentTimestamp)->where('id_plant', 'CAEP0v54HFOtV1FsuyB');
+        $sensorData = [
+            'id_device' => 'CAEP0v54HFOtV1FsuyB',
+            'timestamp_pengukuran' => $currentTimestamp,
+            'id_plant' => $con_data['id_device'] == 'master' ? 0 : $con_data['id_device'],
+            'suhu' => $con_data['suhu'] == '-' ? 0 : $con_data['suhu'],
+            'kelembapan_udara' => $con_data['kelembapan_udara'] == '-' ? 0 : $con_data['kelembapan_udara'],
+            'kelembapan_tanah' => $con_data['kelembapan_tanah'] == '-' ? 0 : $con_data['kelembapan_tanah'],
+            'ph_tanah' => $con_data['ph_tanah'] == '-' ? 0 : $con_data['ph_tanah'],
+            'nitrogen' => $con_data['nitrogen'] == '-' ? 0 : $con_data['nitrogen'],
+            'fosfor' => $con_data['fosfor'] == '-' ? 0 : $con_data['fosfor'],
+            'kalium' => $con_data['pottasium'] == '-' ? 0 : $con_data['pottasium'],
+        ];
 
+        $filteredData = array_filter($sensorData, function ($value) {
+            return $value !== 0;
+        });
+
+        $sensor = Sensor::where('timestamp_pengukuran', $currentTimestamp)->where('id_device', 'CAEP0v54HFOtV1FsuyB');
+
+        try {
             if ($sensor->exists()) {
-                Log::info("Slave update");
-                $isComplete = true;
-
-                $sensor->update([
-                    'id_plant' => $con_data['id_device'] == '-' ? 0 : $con_data['id_device'],
-                    'kelembapan_tanah' => $con_data['kelembapan_tanah'] == '-' ? 0 : $con_data['kelembapan_tanah'],
-                    'ph_tanah' => $con_data['ph_tanah'] == '-' ? 0 : $con_data['ph_tanah'],
-                    'nitrogen' => $con_data['nitrogen'] == '-' ? 0 : $con_data['nitrogen'],
-                    'fosfor' => $con_data['fosfor'] == '-' ? 0 : $con_data['fosfor'],
-                    'kalium' => $con_data['pottasium'] == '-' ? 0 : $con_data['pottasium'],
-                ]);
-            } else {
-                $affectedRows = Sensor::where('timestamp_pengukuran', $currentTimestamp)
-                    ->update([
-                        'id_plant' => $con_data['id_device'] == '-' ? 0 : $con_data['id_device'],
-                        'kelembapan_tanah' => $con_data['kelembapan_tanah'] == '-' ? 0 : $con_data['kelembapan_tanah'],
-                        'ph_tanah' => $con_data['ph_tanah'] == '-' ? 0 : $con_data['ph_tanah'],
-                        'nitrogen' => $con_data['nitrogen'] == '-' ? 0 : $con_data['nitrogen'],
-                        'fosfor' => $con_data['fosfor'] == '-' ? 0 : $con_data['fosfor'],
-                        'kalium' => $con_data['pottasium'] == '-' ? 0 : $con_data['pottasium'],
-                    ]);
-                if ($affectedRows > 0) {
+                if (!empty($filteredData)) {
+                    $sensor->update($filteredData);
+                    Log::info("Sensor data updated for device 'CAEP0v54HFOtV1FsuyB'.");
                     $isComplete = true;
-                    Log::info("Slave Updated {$affectedRows} sensors.");
-                } else {
-                    Log::info("Slave create");
-                    Sensor::create([
-                        'id_device' => 'CAEP0v54HFOtV1FsuyB',
-                        'id_plant' => $con_data['id_device'] == '-' ? 0 : $con_data['id_device'],
-                        'suhu' => $con_data['suhu'] == '-' ? 0 : $con_data['suhu'],
-                        'kelembapan_udara' => $con_data['kelembapan_udara'] == '-' ? 0 : $con_data['kelembapan_udara'],
-                        'kelembapan_tanah' => $con_data['kelembapan_tanah'] == '-' ? 0 : $con_data['kelembapan_tanah'],
-                        'ph_tanah' => $con_data['ph_tanah'] == '-' ? 0 : $con_data['ph_tanah'],
-                        'nitrogen' => $con_data['nitrogen'] == '-' ? 0 : $con_data['nitrogen'],
-                        'fosfor' => $con_data['fosfor'] == '-' ? 0 : $con_data['fosfor'],
-                        'kalium' => $con_data['pottasium'] == '-' ? 0 : $con_data['pottasium'],
-                        'timestamp_pengukuran' => $currentTimestamp,
-                    ]);
+                    Log::info($isComplete);
                 }
-            }
-        }
-
-        if ($con_data['id_device'] == 'master') {
-            $affectedRows = Sensor::where('timestamp_pengukuran', $currentTimestamp)
-                ->update([
-                    'suhu' => $con_data['suhu'] == '-' ? 0 : $con_data['suhu'],
-                    'kelembapan_udara' => $con_data['kelembapan_udara'] == '-' ? 0 : $con_data['kelembapan_udara'],
-                ]);
-
-            if ($affectedRows > 0) {
-                $isComplete = true;
-                Log::info("Master Updated {$affectedRows} sensors.");
             } else {
-                Log::info("Master create");
-                Sensor::create([
-                    'id_device' => 'CAEP0v54HFOtV1FsuyB',
-                    'suhu' => $con_data['suhu'] == '-' ? 0 : $con_data['suhu'],
-                    'kelembapan_udara' => $con_data['kelembapan_udara'] == '-' ? 0 : $con_data['kelembapan_udara'],
-                    'kelembapan_tanah' => $con_data['kelembapan_tanah'] == '-' ? 0 : $con_data['kelembapan_tanah'],
-                    'ph_tanah' => $con_data['ph_tanah'] == '-' ? 0 : $con_data['ph_tanah'],
-                    'nitrogen' => $con_data['nitrogen'] == '-' ? 0 : $con_data['nitrogen'],
-                    'fosfor' => $con_data['fosfor'] == '-' ? 0 : $con_data['fosfor'],
-                    'kalium' => $con_data['pottasium'] == '-' ? 0 : $con_data['pottasium'],
-                    'timestamp_pengukuran' => $currentTimestamp,
-                ]);
+                Sensor::create($sensorData);
+                Log::info("New sensor data created for device 'CAEP0v54HFOtV1FsuyB'.");
             }
+        } catch (\Exception $e) {
+            Log::error('Failed to save sensor data for device CAEP0v54HFOtV1FsuyB: ' . $e->getMessage());
         }
 
         if ($isComplete) {
@@ -144,7 +107,7 @@ class SensorDevice
             $data_response = json_decode($response, true)['data'];
 
             if ($data_response['Informasi Kluster']['nyala']) {
-                $type = 0;
+                $type = 1;
                 $status = 'OPEN';
                 $durasi = $data_response['Informasi Kluster']['waktu'];
                 $menit = $durasi / 60;
