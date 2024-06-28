@@ -30,13 +30,13 @@ class IrrigationScheduler
                         ]);
 
                        Http::post(route('antares.downlink'), $dataDownlink);
-                        // Log::info("irrigation scheduler device: update status device");       
+                         Log::info("irrigation scheduler device: update status device");       
                     } else {
-                        // Log::info("irrigation scheduler : no device data updated");       
+                         Log::info("irrigation scheduler : no device data updated");       
                     }
                 }
             } else {
-                // Log::info("irrigation scheduler device: no device active");       
+                 Log::info("irrigation scheduler device: no device active");       
             }
         } catch(\Exception $e) {
             Log::error("irrigation scheduler device: ".$e->getMessage());
@@ -64,13 +64,13 @@ class IrrigationScheduler
                         ]);
 
                        Http::post(route('antares.downlink'), $dataDownlink);
-                        // Log::info("irrigation scheduler : device pending started");
+                         Log::info("irrigation scheduler : device pending started");
                     } else {
-                        // Log::info("irrigation scheduler : still pending device");
+                         Log::info("irrigation scheduler : still pending device");
                     }
                 }
             } else {
-                // Log::info("irrigation scheduler device: no device pending");
+                 Log::info("irrigation scheduler device: no device pending");
             }
         } catch (\Exception $e) {
             Log::error("irrigation scheduler : " . $e->getMessage());

@@ -64,15 +64,13 @@ class CameraDevice
                     ));
 
                     $imageUrl = $uploadResponse->result->url;
-
+                    
                     Log::info('Imagekit:', [
                         'imgkit' => $imageUrl,
                     ]);
 
                     $image = Image::make($imageUrl);
-
-                    // // Kompresi gambar, misal dengan kualitas 90%
-                    $image->encode('jpg', 90);
+                    $image->encode('jpg', 100);
 
                     $predictResponse = Http::attach(
                         'file',

@@ -81,7 +81,7 @@ class SensorDevice
         if ($isComplete) {
             $currentTimestamp = Carbon::now()->format('Y:m:d H:i');
             $datas = Sensor::where('id_device', 'CAEP0v54HFOtV1FsuyB')->where('timestamp_pengukuran', $currentTimestamp)->get();
-            
+
             $total_soil = 0;
             $total_hum = 0;
             $total_temp = 0;
@@ -125,12 +125,12 @@ class SensorDevice
                 if ($responseDownlink->status() == 200) {
                     try {
                         $irrigation = Irrigation::create([
-                                'id_device' => 'CAEP0v54HFOtV1FsuyB',
-                                'rekomendasi_volume' => $volume,
-                                'kondisi' => $data_response['Kondisi'],
-                                'saran' => $data_response['Saran'],
-                            ]);
-                            
+                            'id_device' => 'CAEP0v54HFOtV1FsuyB',
+                            'rekomendasi_volume' => $volume,
+                            'kondisi' => $data_response['Kondisi'],
+                            'saran' => $data_response['Saran'],
+                        ]);
+
                         $start = Carbon::now();
                         $end = $start->copy()->addSeconds($durasi);
 
@@ -149,8 +149,6 @@ class SensorDevice
                         Log::error('Error creating irrigation record: ' . $e->getMessage());
                         // You might also want to handle the error in a way that is appropriate for your application
                     }
-
-                 
                 }
             } else {
                 $irrigation = Irrigation::create([

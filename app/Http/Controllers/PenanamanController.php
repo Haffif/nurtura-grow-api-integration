@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fertilizer;
 use App\Models\log_penanaman;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\Penanaman;
+use Illuminate\Support\Facades\Http;
 
 class PenanamanController extends Controller
 {
@@ -61,7 +63,7 @@ class PenanamanController extends Controller
                 $penanaman = Penanaman::where('id_user', $id_user)->get();
                 $id_penanaman = $penanaman->id;
 
-                $log_tinggi = log_penanaman::where('id_penanaman',$id_penanaman)->get();
+                $log_tinggi = log_penanaman::where('id_penanaman', $id_penanaman)->get();
             } else {
                 $log_tinggi = log_penanaman::where('id_penanaman', $id_penanaman)->get();
             }
@@ -134,7 +136,7 @@ class PenanamanController extends Controller
                     'tanggal_pencatatan' => $data['tanggal_pencatatan'],
                     'tinggi_tanaman' => $data['tinggi_tanaman'],
                 ]);
-
+                
                 log_penanaman::create([
                     'id_penanaman' => $data['id_penanaman'],
                     'nama_penanaman' => $penanaman->nama_penanaman,
@@ -143,6 +145,29 @@ class PenanamanController extends Controller
                     'tanggal_pencatatan' => $data['tanggal_pencatatan'],
                 ]);
 
+                $pupuk_ml_data = [
+                    "tinggi_tanaman" => $penanaman->tinggi_tanaman,
+                    "hst" => $penanaman->hst,
+                ];
+
+                Log::info($pupuk_ml_data);
+
+                try {
+                    $response = Http::post(route('ml.fertilizer'), $pupuk_ml_data);
+                    if($response['status'] == 200){
+                        Fertilizer::create([
+                            'id_penanaman' => $penanaman->id,
+                            'isOptimal' => $response['data']['tinggi_optimal'],
+                            'message' => $response['data']['message'],
+                            'waktu' => $response['data']['waktu'],
+                        ]);
+                    }
+                } catch (\Throwable $th) {
+                    Log::info($th);
+                    //throw $th;
+                }
+                
+
                 return response()->json([
                     'success' => true,
                     'message'    => 'Data tinggi diupdate !',
@@ -150,8 +175,6 @@ class PenanamanController extends Controller
             } else {
                 return response()->json(['error' => 'Server error', 'message' => 'Data penanaman tidak ditemukan!'], 500);
             }
-
-
         } catch (ValidationException $e) {
             return response()->json(['error' => 'Validation failed', 'messages' => $e->errors()], 422);
         } catch (\Exception $e) {

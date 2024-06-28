@@ -16,10 +16,12 @@ class Penanaman extends Model
         'id_device',
         'tinggi_tanaman',
         'jenis_tanaman',
+        'nama_penanaman',
         'tanggal_tanam',
         'tanggal_panen',
         'tanggal_pencatatan',
-        'nama_penanaman',
+        'hst',
+        'isActive',
         'keterangan',
         'created_at',
         'updated_at'

@@ -23,6 +23,8 @@ return new class extends Migration
             $table->date('tanggal_tanam');
             $table->date('tanggal_panen')->nullable();
             $table->date('tanggal_pencatatan')->nullable();
+            $table->integer('hst')->default(0);
+            $table->boolean('isActive')->default(true);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
         });
